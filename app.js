@@ -552,6 +552,52 @@ valInput.addEventListener('keydown', (e) => {
   }
 });
 
+// Teclado virtual químico: manejar pulsaciones
+const keypadButtons = document.querySelectorAll('.key-btn');
+keypadButtons.forEach(btn => {
+  btn.addEventListener('click', (e) => {
+    e.preventDefault(); // Evita que el botón robe el foco del input
+    initAudio();
+    
+    if (!game.isPlaying || game.isPendingNext) return;
+    
+    const key = btn.getAttribute('data-key');
+    const startPos = valInput.selectionStart;
+    const endPos = valInput.selectionEnd;
+    const val = valInput.value;
+    
+    if (key === 'backspace') {
+      if (startPos !== endPos) {
+        valInput.value = val.substring(0, startPos) + val.substring(endPos);
+        valInput.setSelectionRange(startPos, startPos);
+      } else if (startPos > 0) {
+        valInput.value = val.substring(0, startPos - 1) + val.substring(startPos);
+        valInput.setSelectionRange(startPos - 1, startPos - 1);
+      }
+    } else {
+      // Determinar qué carácter está justo antes del cursor
+      const charBefore = startPos > 0 ? val.charAt(startPos - 1) : '';
+      const isDigitBefore = /\d/.test(charBefore);
+      
+      let appendText = '';
+      
+      // Si el carácter anterior es un dígito y vamos a insertar un dígito o signo,
+      // insertamos automáticamente un espacio antes.
+      if (isDigitBefore) {
+        appendText = ' ' + key;
+      } else {
+        appendText = key;
+      }
+      
+      valInput.value = val.substring(0, startPos) + appendText + val.substring(endPos);
+      const newPos = startPos + appendText.length;
+      valInput.setSelectionRange(newPos, newPos);
+    }
+    
+    valInput.focus(); // Mantiene el foco en la caja de texto
+  });
+});
+
 restartBtn.addEventListener('click', () => {
   initAudio();
   restartGame();

@@ -275,6 +275,67 @@ header p {
   gap: 8px;
 }
 
+/* Teclado Virtual Químico */
+.virtual-keypad {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  width: 100%;
+  margin-bottom: 4px;
+  background: rgba(0, 0, 0, 0.15);
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  padding: 8px;
+}
+
+.keypad-row {
+  display: flex;
+  justify-content: center;
+  gap: 5px;
+  width: 100%;
+}
+
+.key-btn {
+  flex: 1;
+  height: 36px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  color: var(--text-primary);
+  font-family: var(--font-title);
+  font-weight: 700;
+  font-size: 0.95rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  user-select: none;
+  transition: all 0.15s;
+  min-width: 0;
+}
+
+.key-btn:active {
+  background: rgba(255, 255, 255, 0.15);
+  transform: scale(0.92);
+}
+
+.key-btn.key-op {
+  background: rgba(255, 255, 255, 0.08);
+  color: var(--accent-complementario);
+  border-color: rgba(0, 229, 255, 0.15);
+}
+
+.element-card.card-imprescindible .key-btn.key-op {
+  color: var(--accent-imprescindible);
+  border-color: rgba(255, 215, 0, 0.15);
+}
+
+.key-btn.key-backspace {
+  color: var(--color-error);
+  font-size: 0.95rem;
+}
+
+
 .valence-input {
   width: 100%;
   background: rgba(0,0,0,0.3);
