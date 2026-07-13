@@ -196,8 +196,7 @@ const game = {
   maxStreak: 0,
   currentElement: null,
   lastElement: null,
-  isPlaying: true,
-  isPendingNext: false
+  isPlaying: true
 };
 
 // 5. DOM References
@@ -209,6 +208,22 @@ const elAtomicMass = document.getElementById('atomic-mass');
 const elName = document.getElementById('element-name');
 const valInput = document.getElementById('valence-input');
 const submitBtn = document.getElementById('submit-btn');
+
+let answerBuffer = '';
+
+function clearAnswerText() {
+  answerBuffer = '';
+  valInput.replaceChildren();
+}
+
+function setAnswerText(value) {
+  answerBuffer = value;
+  valInput.textContent = value;
+}
+
+function getAnswerText() {
+  return answerBuffer;
+}
 
 const scoreVal = document.getElementById('score-val');
 const errorsVal = document.getElementById('errors-val');
@@ -272,7 +287,7 @@ function formatValencesText(valences) {
       processed.add(val);
       processed.add(opp);
     } else {
-      formatted.push(val > 0 ? `+${val}` : `${val}`);
+      formatted.push(`${val}`);
       processed.add(val);
     }
   }
@@ -281,6 +296,8 @@ function formatValencesText(valences) {
 
 // Load a new element question
 function loadNextElement() {
+  clearAnswerText();
+
   game.currentElement = getRandomElement();
   const el = game.currentElement;
   const details = elementosData[el.name] || { symbol: "?", number: "?", mass: "?" };
@@ -300,10 +317,6 @@ function loadNextElement() {
   elSymbol.textContent = details.symbol;
   elAtomicMass.textContent = details.mass;
   elName.textContent = el.name;
-  
-  // Clear input
-  valInput.value = '';
-  valInput.focus();
 }
 
 // Parse user input into clean integer values
@@ -404,18 +417,11 @@ function triggerExplosion() {
 function checkAnswer() {
   if (!game.isPlaying) return;
   
-  if (game.isPendingNext) {
-    // Proceed to next element
-    feedbackPanel.style.display = 'none';
-    feedbackPanel.className = 'feedback-container';
-    submitBtn.textContent = 'Comprobar Enter ↵';
-    game.isPendingNext = false;
-    loadNextElement();
-    return;
-  }
-  
-  const inputStr = valInput.value.trim();
+  const inputStr = getAnswerText().trim();
   if (!inputStr) return; // Ignore empty submissions
+
+  // Limpia inmediatamente la respuesta visible para no arrastrarla al siguiente elemento.
+  clearAnswerText();
   
   const userValences = parseUserInput(inputStr);
   const expectedValences = game.currentElement.valencias;
@@ -441,10 +447,9 @@ function checkAnswer() {
     feedbackDesc.innerHTML = `Las valencias de <strong>${game.currentElement.name}</strong> son correctas: <span class="correct-answer-display">${expectedStr}</span>.`;
     feedbackPanel.className = 'feedback-container success';
     feedbackPanel.style.display = 'block';
-    
-    // Prepare for next
-    submitBtn.textContent = 'Siguiente Elemento Enter ↵';
-    game.isPendingNext = true;
+
+    // Avanza directamente al siguiente elemento manteniendo visible el feedback
+    loadNextElement();
     
   } else {
     // Incorrect logic
@@ -473,9 +478,8 @@ function checkAnswer() {
       // Game Over, detonate!
       triggerExplosion();
     } else {
-      // Prepare for next
-      submitBtn.textContent = 'Siguiente Elemento Enter ↵';
-      game.isPendingNext = true;
+      // Avanza directamente al siguiente elemento manteniendo visible el feedback
+      loadNextElement();
     }
   }
 }
@@ -486,7 +490,6 @@ function restartGame() {
   game.errors = 0;
   game.streak = 0;
   game.isPlaying = true;
-  game.isPendingNext = false;
   
   scoreVal.textContent = '0';
   errorsVal.textContent = '0/10';
@@ -545,8 +548,15 @@ submitBtn.addEventListener('click', () => {
   checkAnswer();
 });
 
-valInput.addEventListener('keydown', (e) => {
+window.addEventListener('keydown', (e) => {
   if (e.key === 'Enter') {
+    e.preventDefault();
+
+    // Evita que Enter active un botón del teclado virtual que haya quedado enfocado.
+    if (document.activeElement && document.activeElement.classList.contains('key-btn')) {
+      document.activeElement.blur();
+    }
+
     initAudio();
     checkAnswer();
   }
@@ -555,28 +565,25 @@ valInput.addEventListener('keydown', (e) => {
 // Teclado virtual químico: manejar pulsaciones
 const keypadButtons = document.querySelectorAll('.key-btn');
 keypadButtons.forEach(btn => {
+  btn.addEventListener('pointerdown', (e) => {
+    // Evita que el botón gane foco en móvil/escritorio.
+    e.preventDefault();
+  });
+
   btn.addEventListener('click', (e) => {
     e.preventDefault(); // Evita que el botón robe el foco del input
     initAudio();
     
-    if (!game.isPlaying || game.isPendingNext) return;
+    if (!game.isPlaying) return;
     
     const key = btn.getAttribute('data-key');
-    const startPos = valInput.selectionStart;
-    const endPos = valInput.selectionEnd;
-    const val = valInput.value;
+    const val = getAnswerText();
     
     if (key === 'backspace') {
-      if (startPos !== endPos) {
-        valInput.value = val.substring(0, startPos) + val.substring(endPos);
-        valInput.setSelectionRange(startPos, startPos);
-      } else if (startPos > 0) {
-        valInput.value = val.substring(0, startPos - 1) + val.substring(startPos);
-        valInput.setSelectionRange(startPos - 1, startPos - 1);
-      }
+      clearAnswerText();
     } else {
-      // Determinar qué carácter está justo antes del cursor
-      const charBefore = startPos > 0 ? val.charAt(startPos - 1) : '';
+      // Determinar qué carácter está justo antes del final
+      const charBefore = val.charAt(val.length - 1);
       const isDigitBefore = /\d/.test(charBefore);
       
       let appendText = '';
@@ -589,12 +596,10 @@ keypadButtons.forEach(btn => {
         appendText = key;
       }
       
-      valInput.value = val.substring(0, startPos) + appendText + val.substring(endPos);
-      const newPos = startPos + appendText.length;
-      valInput.setSelectionRange(newPos, newPos);
+      setAnswerText(val + appendText);
     }
-    
-    valInput.focus(); // Mantiene el foco en la caja de texto
+
+    btn.blur();
   });
 });
 

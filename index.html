@@ -4,6 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>Entrenador de Valencias</title>
+  <link rel="icon" type="image/png" href="favicon.png">
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -70,17 +71,7 @@
             </div>
           </div>
 
-          <input 
-            type="text" 
-            id="valence-input" 
-            class="valence-input" 
-            placeholder="Ej: ±2 4 6" 
-            autocomplete="off" 
-            autocorrect="off" 
-            autocapitalize="off" 
-            spellcheck="false"
-            inputmode="text"
-          >
+          <div id="valence-input" class="valence-input" aria-label="Respuesta actual"></div>
           <button id="submit-btn" class="submit-btn">Comprobar Enter ↵</button>
           <p class="help-text">Separa por espacios o comas. Se aceptan sin signo como positivas, "+-" o "-+" para valencias dobles.</p>
         </div>

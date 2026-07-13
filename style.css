@@ -338,6 +338,7 @@ header p {
 
 .valence-input {
   width: 100%;
+  min-height: 52px;
   background: rgba(0,0,0,0.3);
   border: 2px solid var(--border-color);
   border-radius: 12px;
@@ -347,23 +348,11 @@ header p {
   font-size: 1.1rem;
   font-weight: 600;
   text-align: center;
-  outline: none;
-  transition: all 0.3s;
-}
-
-.valence-input:focus {
-  border-color: var(--text-secondary);
-  box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.05);
-}
-
-.element-card.card-imprescindible .valence-input:focus {
-  border-color: var(--accent-imprescindible);
-  box-shadow: 0 0 10px rgba(255, 215, 0, 0.2);
-}
-
-.element-card.card-complementario .valence-input:focus {
-  border-color: var(--accent-complementario);
-  box-shadow: 0 0 10px rgba(0, 229, 255, 0.2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  white-space: pre-wrap;
+  user-select: none;
 }
 
 .submit-btn {
