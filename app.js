@@ -2,62 +2,61 @@
    ENTRENADOR DE VALENCIAS - GAME ENGINE
    ========================================================================== */
 
-// 1. Element lists and valences as requested
-const elementosImprescindibles = {
+// 1. Valencias del libro de texto
+const valenciasGenerales = {
   "Hidrógeno": [1, -1],
   "Litio": [1],
   "Sodio": [1],
   "Potasio": [1],
+  "Rubidio": [1],
+  "Cesio": [1],
+  "Francio": [1],
+  "Plata": [1],
   "Berilio": [2],
   "Magnesio": [2],
   "Calcio": [2],
   "Estroncio": [2],
   "Bario": [2],
-  "Aluminio": [3],
-  "Zinc": [2],
-  "Plata": [1],
+  "Radio": [2],
+  "Cinc": [2],
   "Cadmio": [2],
-  "Hierro": [2, 3],
+  "Aluminio": [3],
+  "Galio": [3],
   "Cobre": [1, 2],
-  "Níquel": [2, 3],
-  "Cobalto": [2, 3],
   "Mercurio": [1, 2],
+  "Hierro": [2, 3],
+  "Cobalto": [2, 3],
+  "Níquel": [2, 3],
   "Oro": [1, 3],
+  "Indio": [1, 3],
+  "Talio": [1, 3],
+  "Germanio": [2, 4],
   "Estaño": [2, 4],
   "Plomo": [2, 4],
+  "Paladio": [2, 4],
   "Platino": [2, 4],
   "Cromo": [2, 3, 6],
   "Manganeso": [2, 3, 4, 6, 7],
-  "Boro": [3],
-  "Carbono": [2, 4, -4],
-  "Silicio": [2, 4, -4],
-  "Nitrógeno": [1, 2, -3, 3, 4, 5],
-  "Fósforo": [3, -3, 5],
-  "Arsénico": [3, -3, 5],
-  "Antimonio": [3, -3, 5],
-  "Oxígeno": [-2],
-  "Azufre": [2, -2, 4, 6],
-  "Selenio": [2, -2, 4, 6],
-  "Telurio": [2, -2, 4, 6],
   "Flúor": [-1],
-  "Cloro": [1, -1, 3, 5, 7],
-  "Bromo": [1, -1, 3, 5, 7],
-  "Yodo": [1, -1, 3, 5, 7]
+  "Bismuto": [3, 5]
 };
 
-const elementosComplementarios = {
-  "Rubidio": [1],
-  "Cesio": [1],
-  "Radio": [2],
-  "Titanio": [2, 3, 4],
-  "Paladio": [2, 4],
-  "Galio": [3],
-  "Indio": [3],
-  "Talio": [1, 3],
-  "Germanio": [2, 4, -4],
-  "Bismuto": [3, 5],
-  "Polonio": [2, -2, 4, 6],
-  "Astato": [1, -1, 3, 5, 7]
+const valenciasSegunCombinacion = {
+  "Cloro": { conOxigeno: [1, 3, 5, 7], conOtrosElementos: [-1] },
+  "Bromo": { conOxigeno: [1, 3, 5, 7], conOtrosElementos: [-1] },
+  "Yodo": { conOxigeno: [1, 3, 5, 7], conOtrosElementos: [-1] },
+  "Astato": { conOxigeno: [1, 3, 5, 7], conOtrosElementos: [-1] },
+  "Azufre": { conOxigeno: [2, 4, 6], conOtrosElementos: [-2] },
+  "Selenio": { conOxigeno: [2, 4, 6], conOtrosElementos: [-2] },
+  "Teluro": { conOxigeno: [2, 4, 6], conOtrosElementos: [-2] },
+  "Polonio": { conOxigeno: [2, 4], conOtrosElementos: [-2] },
+  "Fósforo": { conOxigeno: [3, 5], conOtrosElementos: [-3] },
+  "Arsénico": { conOxigeno: [3, 5], conOtrosElementos: [-3] },
+  "Antimonio": { conOxigeno: [3, 5], conOtrosElementos: [-3] },
+  "Carbono": { conOxigeno: [2, 4], conOtrosElementos: [-4] },
+  "Silicio": { conOxigeno: [4], conOtrosElementos: [-4] },
+  "Boro": { conOxigeno: [3], conOtrosElementos: [-3] },
+  "Nitrógeno": { conOxigeno: [1, 2, 3, 4, 5], conOtrosElementos: [-3] }
 };
 
 // 2. Extra chemistry details to render high-fidelity periodic blocks
@@ -66,13 +65,14 @@ const elementosData = {
   "Litio": { symbol: "Li", number: 3, mass: 6.94 },
   "Sodio": { symbol: "Na", number: 11, mass: 22.99 },
   "Potasio": { symbol: "K", number: 19, mass: 39.10 },
+  "Francio": { symbol: "Fr", number: 87, mass: 223 },
   "Berilio": { symbol: "Be", number: 4, mass: 9.012 },
   "Magnesio": { symbol: "Mg", number: 12, mass: 24.31 },
   "Calcio": { symbol: "Ca", number: 20, mass: 40.08 },
   "Estroncio": { symbol: "Sr", number: 38, mass: 87.62 },
   "Bario": { symbol: "Ba", number: 56, mass: 137.33 },
   "Aluminio": { symbol: "Al", number: 13, mass: 26.98 },
-  "Zinc": { symbol: "Zn", number: 30, mass: 65.38 },
+  "Cinc": { symbol: "Zn", number: 30, mass: 65.38 },
   "Plata": { symbol: "Ag", number: 47, mass: 107.87 },
   "Cadmio": { symbol: "Cd", number: 48, mass: 112.41 },
   "Hierro": { symbol: "Fe", number: 26, mass: 55.85 },
@@ -93,10 +93,9 @@ const elementosData = {
   "Fósforo": { symbol: "P", number: 15, mass: 30.97 },
   "Arsénico": { symbol: "As", number: 33, mass: 74.92 },
   "Antimonio": { symbol: "Sb", number: 51, mass: 121.76 },
-  "Oxígeno": { symbol: "O", number: 8, mass: 15.999 },
   "Azufre": { symbol: "S", number: 16, mass: 32.06 },
   "Selenio": { symbol: "Se", number: 34, mass: 78.97 },
-  "Telurio": { symbol: "Te", number: 52, mass: 127.60 },
+  "Teluro": { symbol: "Te", number: 52, mass: 127.60 },
   "Flúor": { symbol: "F", number: 9, mass: 19.00 },
   "Cloro": { symbol: "Cl", number: 17, mass: 35.45 },
   "Bromo": { symbol: "Br", number: 35, mass: 79.90 },
@@ -105,7 +104,6 @@ const elementosData = {
   "Rubidio": { symbol: "Rb", number: 37, mass: 85.47 },
   "Cesio": { symbol: "Cs", number: 55, mass: 132.91 },
   "Radio": { symbol: "Ra", number: 88, mass: 226 },
-  "Titanio": { symbol: "Ti", number: 22, mass: 47.87 },
   "Paladio": { symbol: "Pd", number: 46, mass: 106.42 },
   "Galio": { symbol: "Ga", number: 31, mass: 69.72 },
   "Indio": { symbol: "In", number: 49, mass: 114.82 },
@@ -249,26 +247,36 @@ const closeStudyBtn = document.getElementById('close-study-btn');
 
 // 6. Game Logic Functions
 
-// Pick random element weighted: 60% Imprescindibles, 40% Complementarios
+const questionPool = [
+  ...Object.entries(valenciasGenerales).map(([name, valencias]) => ({
+    name,
+    valencias,
+    combination: null
+  })),
+  ...Object.entries(valenciasSegunCombinacion).flatMap(([name, valencias]) => [
+    { name, valencias: valencias.conOxigeno, combination: 'conOxigeno' },
+    { name, valencias: valencias.conOtrosElementos, combination: 'conOtrosElementos' }
+  ])
+];
+
+// Pick a random question, avoiding an immediate repeat of the same element/context.
 function getRandomElement() {
-  const useImprescindible = Math.random() < 0.6;
-  const list = useImprescindible ? elementosImprescindibles : elementosComplementarios;
-  const keys = Object.keys(list);
-  
-  let chosenKey = keys[Math.floor(Math.random() * keys.length)];
-  
-  // Reroll once if it's the exact same element to give more variety
-  if (chosenKey === game.lastElement && keys.length > 1) {
-    chosenKey = keys[Math.floor(Math.random() * keys.length)];
+  let question = questionPool[Math.floor(Math.random() * questionPool.length)];
+  let questionKey = `${question.name}:${question.combination || 'general'}`;
+
+  if (questionKey === game.lastElement && questionPool.length > 1) {
+    question = questionPool[Math.floor(Math.random() * questionPool.length)];
+    questionKey = `${question.name}:${question.combination || 'general'}`;
   }
-  
-  game.lastElement = chosenKey;
-  
-  return {
-    name: chosenKey,
-    valencias: list[chosenKey],
-    category: useImprescindible ? "imprescindible" : "complementario"
-  };
+
+  game.lastElement = questionKey;
+  return question;
+}
+
+function getCombinationLabel(combination) {
+  if (combination === 'conOxigeno') return 'con oxígeno';
+  if (combination === 'conOtrosElementos') return 'con otros elementos';
+  return '';
 }
 
 // Format valence arrays to neat human strings: [2, -2, 4, 6] -> "±2, +4, +6"
@@ -302,15 +310,18 @@ function loadNextElement() {
   const el = game.currentElement;
   const details = elementosData[el.name] || { symbol: "?", number: "?", mass: "?" };
   
-  // Reset card state
-  elCard.className = `element-card card-${el.category}`;
-  
-  if (el.category === 'imprescindible') {
-    elBadge.className = 'category-badge badge-imprescindible';
-    elBadge.innerHTML = '⭐ Imprescindible';
+  const combinationLabel = getCombinationLabel(el.combination);
+  elCard.className = `element-card${el.combination ? ` card-${el.combination}` : ''}`;
+
+  if (el.combination) {
+    elBadge.hidden = false;
+    elBadge.className = `category-badge badge-${el.combination}`;
+    elBadge.textContent = el.combination === 'conOxigeno'
+      ? 'O₂ Con oxígeno'
+      : '⚛ Con otros elementos';
   } else {
-    elBadge.className = 'category-badge badge-complementario';
-    elBadge.innerHTML = 'ℹ️ Complementario';
+    elBadge.hidden = true;
+    elBadge.textContent = '';
   }
   
   elAtomicNumber.textContent = details.number;
@@ -444,7 +455,8 @@ function checkAnswer() {
     
     // Feedback
     feedbackTitle.innerHTML = '✅ ¡Buen trabajo, Jacobo!';
-    feedbackDesc.innerHTML = `Las valencias de <strong>${game.currentElement.name}</strong> son correctas: <span class="correct-answer-display">${expectedStr}</span>.`;
+    const context = getCombinationLabel(game.currentElement.combination);
+    feedbackDesc.innerHTML = `Las valencias de <strong>${game.currentElement.name}</strong>${context ? ` ${context}` : ''} son correctas: <span class="correct-answer-display">${expectedStr}</span>.`;
     feedbackPanel.className = 'feedback-container success';
     feedbackPanel.style.display = 'block';
 
@@ -470,7 +482,8 @@ function checkAnswer() {
     
     // Feedback
     feedbackTitle.innerHTML = '❌ ¡Incorrecto!';
-    feedbackDesc.innerHTML = `Para el <strong>${game.currentElement.name}</strong> se esperaba: <span class="correct-answer-display">${expectedStr}</span>.<br>Escribiste: <em>${inputStr || 'nada'}</em>.`;
+    const context = getCombinationLabel(game.currentElement.combination);
+    feedbackDesc.innerHTML = `Para el <strong>${game.currentElement.name}</strong>${context ? ` ${context}` : ''} se esperaba: <span class="correct-answer-display">${expectedStr}</span>.<br>Escribiste: <em>${inputStr || 'nada'}</em>.`;
     feedbackPanel.className = 'feedback-container error';
     feedbackPanel.style.display = 'block';
     
@@ -512,33 +525,33 @@ function restartGame() {
 
 // Populate the Study Modal lists dynamically
 function populateStudyTable() {
-  const impList = document.getElementById('study-imprescindibles');
-  const compList = document.getElementById('study-complementarios');
+  const generalList = document.getElementById('study-generales');
+  const combinationList = document.getElementById('study-segun-combinacion');
   
-  impList.innerHTML = '';
-  compList.innerHTML = '';
+  generalList.innerHTML = '';
+  combinationList.innerHTML = '';
   
-  const sortedImp = Object.keys(elementosImprescindibles).sort((a, b) => a.localeCompare(b));
-  const sortedComp = Object.keys(elementosComplementarios).sort((a, b) => a.localeCompare(b));
+  const sortedGeneral = Object.keys(valenciasGenerales).sort((a, b) => a.localeCompare(b));
+  const sortedCombination = Object.keys(valenciasSegunCombinacion).sort((a, b) => a.localeCompare(b));
   
-  sortedImp.forEach(name => {
-    const valences = elementosImprescindibles[name];
+  sortedGeneral.forEach(name => {
+    const valences = valenciasGenerales[name];
     const details = elementosData[name] || { symbol: '?' };
     
     const row = document.createElement('div');
     row.className = 'study-row';
     row.innerHTML = `<span><strong>${details.symbol}</strong> - ${name}</span><span class="valence-list">${formatValencesText(valences)}</span>`;
-    impList.appendChild(row);
+    generalList.appendChild(row);
   });
   
-  sortedComp.forEach(name => {
-    const valences = elementosComplementarios[name];
+  sortedCombination.forEach(name => {
+    const valences = valenciasSegunCombinacion[name];
     const details = elementosData[name] || { symbol: '?' };
     
     const row = document.createElement('div');
-    row.className = 'study-row';
-    row.innerHTML = `<span><strong>${details.symbol}</strong> - ${name}</span><span class="valence-list">${formatValencesText(valences)}</span>`;
-    compList.appendChild(row);
+    row.className = 'study-row study-row-combination';
+    row.innerHTML = `<span class="study-element"><strong>${details.symbol}</strong> - ${name}</span><span class="combination-valences"><span><small>Con O₂</small><strong>${formatValencesText(valences.conOxigeno)}</strong></span><span><small>Con otros</small><strong>${formatValencesText(valences.conOtrosElementos)}</strong></span></span>`;
+    combinationList.appendChild(row);
   });
 }
 

@@ -14,8 +14,8 @@
   --text-secondary: #8b949e;
   
   /* Neon Accents */
-  --accent-imprescindible: #ffd700; /* Gold */
-  --accent-complementario: #00e5ff; /* Cyan */
+  --accent-oxygen: #ffd700; /* Gold */
+  --accent-other-elements: #00e5ff; /* Cyan */
   --color-success: #00e676; /* Green */
   --color-error: #ff1744; /* Red */
   
@@ -144,7 +144,7 @@ header p {
 
 .stat-value.score { color: var(--color-success); }
 .stat-value.errors { color: var(--color-error); }
-.stat-value.streak { color: var(--accent-imprescindible); }
+.stat-value.streak { color: var(--accent-oxygen); }
 
 /* Main Card */
 .card-section {
@@ -170,11 +170,11 @@ header p {
   backdrop-filter: blur(10px);
 }
 
-.element-card.card-imprescindible {
+.element-card.card-conOxigeno {
   border-color: rgba(255, 215, 0, 0.2);
 }
 
-.element-card.card-complementario {
+.element-card.card-conOtrosElementos {
   border-color: rgba(0, 229, 255, 0.2);
 }
 
@@ -194,15 +194,15 @@ header p {
   gap: 4px;
 }
 
-.badge-imprescindible {
+.badge-conOxigeno {
   background: rgba(255, 215, 0, 0.1);
-  color: var(--accent-imprescindible);
+  color: var(--accent-oxygen);
   border: 1px solid rgba(255, 215, 0, 0.3);
 }
 
-.badge-complementario {
+.badge-conOtrosElementos {
   background: rgba(0, 229, 255, 0.1);
-  color: var(--accent-complementario);
+  color: var(--accent-other-elements);
   border: 1px solid rgba(0, 229, 255, 0.3);
 }
 
@@ -242,13 +242,13 @@ header p {
   align-self: center;
 }
 
-.element-card.card-imprescindible .periodic-block {
-  border-color: var(--accent-imprescindible);
+.element-card.card-conOxigeno .periodic-block {
+  border-color: var(--accent-oxygen);
   box-shadow: 0 0 15px rgba(255, 215, 0, 0.15);
 }
 
-.element-card.card-complementario .periodic-block {
-  border-color: var(--accent-complementario);
+.element-card.card-conOtrosElementos .periodic-block {
+  border-color: var(--accent-other-elements);
   box-shadow: 0 0 15px rgba(0, 229, 255, 0.15);
 }
 
@@ -321,12 +321,12 @@ header p {
 
 .key-btn.key-op {
   background: rgba(255, 255, 255, 0.08);
-  color: var(--accent-complementario);
+  color: var(--accent-other-elements);
   border-color: rgba(0, 229, 255, 0.15);
 }
 
-.element-card.card-imprescindible .key-btn.key-op {
-  color: var(--accent-imprescindible);
+.element-card.card-conOxigeno .key-btn.key-op {
+  color: var(--accent-oxygen);
   border-color: rgba(255, 215, 0, 0.15);
 }
 
@@ -755,7 +755,7 @@ header p {
   border-bottom: 1px solid var(--border-color);
   padding-bottom: 4px;
   margin-bottom: 8px;
-  color: var(--accent-imprescindible);
+  color: var(--accent-oxygen);
 }
 
 .study-list {
@@ -776,6 +776,31 @@ header p {
 .study-row .valence-list {
   font-weight: 700;
   color: var(--text-primary);
+}
+
+.study-row-combination {
+  align-items: center;
+  gap: 8px;
+}
+
+.study-element {
+  flex: 1;
+}
+
+.combination-valences {
+  display: grid;
+  gap: 3px;
+  min-width: 112px;
+}
+
+.combination-valences > span {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.combination-valences small {
+  color: var(--text-secondary);
 }
 
 .close-study-btn {

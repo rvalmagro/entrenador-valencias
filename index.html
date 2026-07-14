@@ -38,9 +38,9 @@
 
     <!-- Element Card Quiz -->
     <section class="card-section">
-      <div id="element-card" class="element-card card-imprescindible">
-        <!-- Badge showing category -->
-        <span id="category-badge" class="category-badge badge-imprescindible">⭐ Imprescindible</span>
+      <div id="element-card" class="element-card">
+        <!-- Only shown when the valences depend on what the element combines with -->
+        <span id="category-badge" class="category-badge" hidden></span>
         
         <!-- Periodic block representation -->
         <div class="periodic-block">
@@ -222,18 +222,18 @@
       <h2 class="study-title">🧪 Tabla de Valencias</h2>
       
       <div class="study-grid">
-        <!-- Imprescindibles Column -->
+        <!-- General valences -->
         <div>
-          <h3 class="study-category-title">⭐ Elementos Imprescindibles</h3>
-          <div id="study-imprescindibles" class="study-list">
+          <h3 class="study-category-title">Valencias generales</h3>
+          <div id="study-generales" class="study-list">
             <!-- Dynamic elements load here -->
           </div>
         </div>
         
-        <!-- Complementarios Column -->
+        <!-- Valences that depend on the combination -->
         <div>
-          <h3 class="study-category-title">ℹ️ Elementos Complementarios</h3>
-          <div id="study-complementarios" class="study-list">
+          <h3 class="study-category-title">Según la combinación</h3>
+          <div id="study-segun-combinacion" class="study-list">
             <!-- Dynamic elements load here -->
           </div>
         </div>
