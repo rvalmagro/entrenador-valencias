@@ -332,32 +332,18 @@ function loadNextElement() {
 
 // Parse user input into clean integer values
 function parseUserInput(inputString) {
-  // Replace ± with +-
-  let normalized = inputString.replace(/±/g, '+-');
-  // Remove space after sign (e.g. "+ 2" -> "+2", "+- 3" -> "+-3")
-  normalized = normalized.replace(/([+-]{1,2})\s+(\d+)/g, '$1$2');
-  
   // Split on commas, spaces, or semicolons
-  const tokens = normalized.split(/[\s,;]+/);
+  const tokens = inputString.split(/[\s,;]+/);
   const results = [];
   
   for (let token of tokens) {
     token = token.trim();
     if (!token) continue;
-    
-    // Check for +-X or -+X (double valence)
-    const doubleMatch = token.match(/^([+-]{2}|[-+]{2})(\d+)$/);
-    if (doubleMatch) {
-      const val = parseInt(doubleMatch[2], 10);
-      results.push(val);
-      results.push(-val);
-    } else {
-      // Single valence (+X, -X, X)
-      const singleMatch = token.match(/^([+-]?\d+)$/);
-      if (singleMatch) {
-        const val = parseInt(singleMatch[1], 10);
-        results.push(val);
-      }
+
+    // Positive valences may omit "+"; negative valences require "-".
+    const singleMatch = token.match(/^([+-]?\d+)$/);
+    if (singleMatch) {
+      results.push(parseInt(singleMatch[1], 10));
     }
   }
   
