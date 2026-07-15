@@ -37,6 +37,7 @@ const valenciasGenerales = {
   "Platino": [2, 4],
   "Cromo": [2, 3, 6],
   "Manganeso": [2, 3, 4, 6, 7],
+  "Oxígeno": [-2],
   "Flúor": [-1],
   "Bismuto": [3, 5]
 };
@@ -45,12 +46,12 @@ const valenciasSegunCombinacion = {
   "Cloro": { conOxigeno: [1, 3, 5, 7], conOtrosElementos: [-1] },
   "Bromo": { conOxigeno: [1, 3, 5, 7], conOtrosElementos: [-1] },
   "Yodo": { conOxigeno: [1, 3, 5, 7], conOtrosElementos: [-1] },
-  "Astato": { conOxigeno: [1, 3, 5, 7], conOtrosElementos: [-1] },
+  "Astato": { conOxigeno: [[1], [1, 3, 5, 7]], conOtrosElementos: [-1] },
   "Azufre": { conOxigeno: [2, 4, 6], conOtrosElementos: [-2] },
   "Selenio": { conOxigeno: [2, 4, 6], conOtrosElementos: [-2] },
   "Teluro": { conOxigeno: [2, 4, 6], conOtrosElementos: [-2] },
   "Polonio": { conOxigeno: [2, 4], conOtrosElementos: [-2] },
-  "Fósforo": { conOxigeno: [3, 5], conOtrosElementos: [-3] },
+  "Fósforo": { conOxigeno: [[1, 3, 5], [3, 5]], conOtrosElementos: [-3] },
   "Arsénico": { conOxigeno: [3, 5], conOtrosElementos: [-3] },
   "Antimonio": { conOxigeno: [3, 5], conOtrosElementos: [-3] },
   "Carbono": { conOxigeno: [2, 4], conOtrosElementos: [-4] },
@@ -90,6 +91,7 @@ const elementosData = {
   "Carbono": { symbol: "C", number: 6, mass: 12.011 },
   "Silicio": { symbol: "Si", number: 14, mass: 28.09 },
   "Nitrógeno": { symbol: "N", number: 7, mass: 14.007 },
+  "Oxígeno": { symbol: "O", number: 8, mass: 15.999 },
   "Fósforo": { symbol: "P", number: 15, mass: 30.97 },
   "Arsénico": { symbol: "As", number: 33, mass: 74.92 },
   "Antimonio": { symbol: "Sb", number: 51, mass: 121.76 },
@@ -250,14 +252,20 @@ const closeStudyBtn = document.getElementById('close-study-btn');
 const questionPool = [
   ...Object.entries(valenciasGenerales).map(([name, valencias]) => ({
     name,
-    valencias,
+    acceptedAnswers: [valencias],
     combination: null
   })),
   ...Object.entries(valenciasSegunCombinacion).flatMap(([name, valencias]) => [
-    { name, valencias: valencias.conOxigeno, combination: 'conOxigeno' },
-    { name, valencias: valencias.conOtrosElementos, combination: 'conOtrosElementos' }
+    { name, acceptedAnswers: getAcceptedAnswers(valencias.conOxigeno), combination: 'conOxigeno' },
+    { name, acceptedAnswers: getAcceptedAnswers(valencias.conOtrosElementos), combination: 'conOtrosElementos' }
   ])
 ];
+
+// A normal value is one answer (for example, [3, 5]). Exceptional values
+// contain several complete alternatives (for example, [[1, 3, 5], [3, 5]]).
+function getAcceptedAnswers(value) {
+  return Array.isArray(value[0]) ? value : [value];
+}
 
 // Pick a random question, avoiding an immediate repeat of the same element/context.
 function getRandomElement() {
@@ -300,6 +308,10 @@ function formatValencesText(valences) {
     }
   }
   return formatted.join(', ');
+}
+
+function formatAcceptedAnswers(acceptedAnswers) {
+  return acceptedAnswers.map(formatValencesText).join(' o ');
 }
 
 // Load a new element question
@@ -351,8 +363,8 @@ function parseUserInput(inputString) {
   return [...new Set(results)];
 }
 
-// Compare user set of valences with the expected set of valences
-function validateAnswer(userValences, expectedValences) {
+// Compare the user's set with one complete accepted answer.
+function matchesValences(userValences, expectedValences) {
   if (userValences.length !== expectedValences.length) return false;
   
   const userSet = new Set(userValences);
@@ -360,6 +372,11 @@ function validateAnswer(userValences, expectedValences) {
     if (!userSet.has(val)) return false;
   }
   return true;
+}
+
+// Any of the configured complete alternatives may be correct.
+function validateAnswer(userValences, acceptedAnswers) {
+  return acceptedAnswers.some(expectedValences => matchesValences(userValences, expectedValences));
 }
 
 // Calculate and move the lighter flame towards the bomb
@@ -421,10 +438,10 @@ function checkAnswer() {
   clearAnswerText();
   
   const userValences = parseUserInput(inputStr);
-  const expectedValences = game.currentElement.valencias;
-  const isCorrect = validateAnswer(userValences, expectedValences);
-  
-  const expectedStr = formatValencesText(expectedValences);
+  const acceptedAnswers = game.currentElement.acceptedAnswers;
+  const isCorrect = validateAnswer(userValences, acceptedAnswers);
+
+  const expectedStr = formatAcceptedAnswers(acceptedAnswers);
   
   if (isCorrect) {
     // Correct logic
@@ -442,7 +459,7 @@ function checkAnswer() {
     // Feedback
     feedbackTitle.innerHTML = '✅ ¡Buen trabajo, Jacobo!';
     const context = getCombinationLabel(game.currentElement.combination);
-    feedbackDesc.innerHTML = `Las valencias de <strong>${game.currentElement.name}</strong>${context ? ` ${context}` : ''} son correctas: <span class="correct-answer-display">${expectedStr}</span>.`;
+    feedbackDesc.innerHTML = `Tu respuesta para <strong>${game.currentElement.name}</strong>${context ? ` ${context}` : ''} es correcta. Respuestas aceptadas: <span class="correct-answer-display">${expectedStr}</span>.`;
     feedbackPanel.className = 'feedback-container success';
     feedbackPanel.style.display = 'block';
 
@@ -536,7 +553,7 @@ function populateStudyTable() {
     
     const row = document.createElement('div');
     row.className = 'study-row study-row-combination';
-    row.innerHTML = `<span class="study-element"><strong>${details.symbol}</strong> - ${name}</span><span class="combination-valences"><span><small>Con O₂</small><strong>${formatValencesText(valences.conOxigeno)}</strong></span><span><small>Con otros</small><strong>${formatValencesText(valences.conOtrosElementos)}</strong></span></span>`;
+    row.innerHTML = `<span class="study-element"><strong>${details.symbol}</strong> - ${name}</span><span class="combination-valences"><span><small>Con O₂</small><strong>${formatAcceptedAnswers(getAcceptedAnswers(valences.conOxigeno))}</strong></span><span><small>Con otros</small><strong>${formatAcceptedAnswers(getAcceptedAnswers(valences.conOtrosElementos))}</strong></span></span>`;
     combinationList.appendChild(row);
   });
 }
