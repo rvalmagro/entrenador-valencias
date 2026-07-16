@@ -513,7 +513,7 @@ function restartGame() {
   
   feedbackPanel.style.display = 'none';
   feedbackPanel.className = 'feedback-container';
-  submitBtn.textContent = 'Comprobar Enter ↵';
+  submitBtn.textContent = 'Comprobar';
   
   // Reset SVGs
   fusePath.classList.remove('burning');
