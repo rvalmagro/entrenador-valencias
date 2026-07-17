@@ -220,6 +220,25 @@
   <div id="study-modal" class="modal-overlay">
     <div class="modal-content study-content">
       <h2 class="study-title">🧪 Tabla de Valencias</h2>
+
+      <fieldset class="study-scope" aria-describedby="study-scope-help">
+        <legend>Elementos que quieres practicar</legend>
+        <div class="study-scope-options">
+          <label>
+            <input type="radio" name="study-scope" value="first">
+            <span>Grupos 1–12</span>
+          </label>
+          <label>
+            <input type="radio" name="study-scope" value="second">
+            <span>Grupos 13–17</span>
+          </label>
+          <label>
+            <input type="radio" name="study-scope" value="all" checked>
+            <span>Ambos</span>
+          </label>
+        </div>
+        <p id="study-scope-help">La selección se aplica desde la siguiente pregunta.</p>
+      </fieldset>
       
       <div class="study-grid">
         <!-- General valences -->

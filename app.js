@@ -246,6 +246,7 @@ const restartBtn = document.getElementById('restart-btn');
 const studyModal = document.getElementById('study-modal');
 const openStudyBtn = document.getElementById('open-study-btn');
 const closeStudyBtn = document.getElementById('close-study-btn');
+const studyScopeInputs = document.querySelectorAll('input[name="study-scope"]');
 
 // 6. Game Logic Functions
 
@@ -261,6 +262,46 @@ const questionPool = [
   ])
 ];
 
+// Grupos 13–17 indicados para la segunda fase de estudio. El primer
+// subconjunto es el resto de elementos disponibles (grupos 1–12).
+const secondSubsetSymbols = new Set([
+  'B', 'Al', 'Ga', 'In', 'Tl',
+  'C', 'Si', 'Ge', 'Sn', 'Pb',
+  'N', 'P', 'As', 'Sb', 'Bi',
+  'O', 'S', 'Se', 'Te', 'Po',
+  'F', 'Cl', 'Br', 'I', 'At'
+]);
+
+const STUDY_SCOPE_KEY = 'valence-study-scope';
+const validStudyScopes = new Set(['first', 'second', 'all']);
+let studyScope = 'all';
+
+function getQuestionPoolForScope() {
+  if (studyScope === 'all') return questionPool;
+
+  return questionPool.filter(question => {
+    const symbol = elementosData[question.name]?.symbol;
+    const belongsToSecondSubset = secondSubsetSymbols.has(symbol);
+    return studyScope === 'second' ? belongsToSecondSubset : !belongsToSecondSubset;
+  });
+}
+
+function setStudyScope(scope, loadQuestion = true) {
+  studyScope = validStudyScopes.has(scope) ? scope : 'all';
+  studyScopeInputs.forEach(input => {
+    input.checked = input.value === studyScope;
+  });
+
+  try {
+    localStorage.setItem(STUDY_SCOPE_KEY, studyScope);
+  } catch (error) {
+    // La aplicación sigue funcionando aunque el navegador bloquee el almacenamiento.
+  }
+
+  game.lastElement = null;
+  if (loadQuestion && game.isPlaying) loadNextElement();
+}
+
 // A normal value is one answer (for example, [3, 5]). Exceptional values
 // contain several complete alternatives (for example, [[1, 3, 5], [3, 5]]).
 function getAcceptedAnswers(value) {
@@ -269,11 +310,12 @@ function getAcceptedAnswers(value) {
 
 // Pick a random question, avoiding an immediate repeat of the same element/context.
 function getRandomElement() {
-  let question = questionPool[Math.floor(Math.random() * questionPool.length)];
+  const activeQuestionPool = getQuestionPoolForScope();
+  let question = activeQuestionPool[Math.floor(Math.random() * activeQuestionPool.length)];
   let questionKey = `${question.name}:${question.combination || 'general'}`;
 
-  if (questionKey === game.lastElement && questionPool.length > 1) {
-    question = questionPool[Math.floor(Math.random() * questionPool.length)];
+  if (questionKey === game.lastElement && activeQuestionPool.length > 1) {
+    question = activeQuestionPool[Math.floor(Math.random() * activeQuestionPool.length)];
     questionKey = `${question.name}:${question.combination || 'general'}`;
   }
 
@@ -634,6 +676,12 @@ closeStudyBtn.addEventListener('click', () => {
   studyModal.classList.remove('active');
 });
 
+studyScopeInputs.forEach(input => {
+  input.addEventListener('change', () => {
+    if (input.checked) setStudyScope(input.value);
+  });
+});
+
 // Close modal clicking outside content
 window.addEventListener('click', (e) => {
   if (e.target === studyModal) {
@@ -648,6 +696,13 @@ window.addEventListener('resize', () => {
 
 // 8. Initial Load
 window.addEventListener('DOMContentLoaded', () => {
+  let savedStudyScope = 'all';
+  try {
+    savedStudyScope = localStorage.getItem(STUDY_SCOPE_KEY) || 'all';
+  } catch (error) {
+    // Usa ambos subconjuntos si el almacenamiento no está disponible.
+  }
+  setStudyScope(savedStudyScope, false);
   populateStudyTable();
   loadNextElement();
   updateLighterPosition();
